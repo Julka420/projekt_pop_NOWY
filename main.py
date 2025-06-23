@@ -237,3 +237,41 @@ def zapisz_edycje(i):
     pokaz_centra()
     entry_nazwa.delete(0, END)
     button_dodaj.config(text="Dodaj centrum", command=dodaj_centrum)
+
+# === GUI ===
+root = Tk()
+root.title("Centra Handlowe – Mapa i Zarządzanie")
+root.geometry("1200x700")
+
+ramka_lista = Frame(root)
+ramka_formularz = Frame(root)
+ramka_mapa = Frame(root)
+
+ramka_lista.pack(side=LEFT, padx=10, pady=10)
+ramka_formularz.pack(side=TOP, padx=10, pady=10)
+ramka_mapa.pack(side=BOTTOM, padx=10, pady=10, fill=BOTH, expand=True)
+
+Label(ramka_lista, text="Lista centrów handlowych").pack()
+listbox_centra = Listbox(ramka_lista, width=40, height=20)
+listbox_centra.pack()
+Button(ramka_lista, text="Pokaż centrum na mapie", command=pokaz_na_mapie).pack(pady=2)
+Button(ramka_lista, text="Pokaż wszystkie centra", command=pokaz_wszystkie_centra_na_mapie).pack(pady=2)
+Button(ramka_lista, text="Usuń centrum", command=usun_centrum).pack(pady=2)
+Button(ramka_lista, text="Edytuj centrum", command=edytuj_centrum).pack(pady=2)
+Button(ramka_lista, text="Pracownicy", command=lambda: otworz_panel_osob("Pracownicy", Pracownik, centrum_pracownicy)).pack(pady=5)
+Button(ramka_lista, text="Klienci", command=lambda: otworz_panel_osob("Klienci", Klient, centrum_klienci)).pack(pady=5)
+Button(ramka_lista, text="Pokaż pracowników wybranego", command=lambda: pokaz_osoby_centrum("pracownik")).pack(pady=2)
+Button(ramka_lista, text="Pokaż klientów wybranego", command=lambda: pokaz_osoby_centrum("klient")).pack(pady=2)
+
+Label(ramka_formularz, text="Dodaj centrum handlowe (nazwa/adres):").pack()
+entry_nazwa = Entry(ramka_formularz, width=40)
+entry_nazwa.pack()
+button_dodaj = Button(ramka_formularz, text="Dodaj centrum", command=dodaj_centrum)
+button_dodaj.pack(pady=5)
+
+map_widget = tkintermapview.TkinterMapView(ramka_mapa, width=800, height=500, corner_radius=0)
+map_widget.pack(fill=BOTH, expand=True)
+map_widget.set_position(52.23, 21.0)
+map_widget.set_zoom(6)
+
+root.mainloop()
