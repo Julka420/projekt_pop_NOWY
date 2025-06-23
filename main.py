@@ -195,3 +195,45 @@ def pokaz_osoby_centrum(typ_osoby):
         lon = sum(o.longitude for o in osoby) / len(osoby)
         map_widget.set_position(lat, lon)
         map_widget.set_zoom(7)
+
+def usun_centrum():
+    idx = listbox_centra.curselection()
+    if not idx:
+        return
+    i = idx[0]
+    centrum = centra[i]
+    for p in centrum_pracownicy.get(centrum.nazwa, []):
+        if p.marker:
+            p.marker.delete()
+    for k in centrum_klienci.get(centrum.nazwa, []):
+        if k.marker:
+            k.marker.delete()
+    if centrum.marker:
+        centrum.marker.delete()
+    centra.pop(i)
+    centrum_pracownicy.pop(centrum.nazwa, None)
+    centrum_klienci.pop(centrum.nazwa, None)
+    pokaz_centra()
+
+def edytuj_centrum():
+    idx = listbox_centra.curselection()
+    if not idx:
+        return
+    i = idx[0]
+    entry_nazwa.delete(0, END)
+    entry_nazwa.insert(0, centra[i].nazwa)
+    button_dodaj.config(text="Zapisz", command=lambda: zapisz_edycje(i))
+
+def zapisz_edycje(i):
+    nowa_nazwa = entry_nazwa.get().strip()
+    if not nowa_nazwa:
+        return
+    stara_nazwa = centra[i].nazwa
+    if centra[i].marker:
+        centra[i].marker.delete()
+    centra[i] = CentrumHandlowe(nowa_nazwa)
+    centrum_pracownicy[nowa_nazwa] = centrum_pracownicy.pop(stara_nazwa, [])
+    centrum_klienci[nowa_nazwa] = centrum_klienci.pop(stara_nazwa, [])
+    pokaz_centra()
+    entry_nazwa.delete(0, END)
+    button_dodaj.config(text="Dodaj centrum", command=dodaj_centrum)
