@@ -141,3 +141,57 @@ def otworz_panel_osob(nazwa_typu, typ_klasy, baza_danych):
     Button(okno, text="Pokaż wszystkich na mapie", command=pokaz_na_mapie_wszystkich).pack(pady=4)
 
     odswiez()
+# === OPERACJE CENTRÓW ===
+def dodaj_centrum():
+    nazwa = entry_nazwa.get().strip()
+    if not nazwa:
+        return
+    centrum = CentrumHandlowe(nazwa)
+    centra.append(centrum)
+    centrum_pracownicy[nazwa] = []
+    centrum_klienci[nazwa] = []
+    pokaz_centra()
+    entry_nazwa.delete(0, END)
+    entry_nazwa.focus()
+
+def pokaz_centra():
+    listbox_centra.delete(0, END)
+    for i, centrum in enumerate(centra):
+        listbox_centra.insert(i, f"{i+1}. {centrum.nazwa}")
+
+def pokaz_na_mapie():
+    idx = listbox_centra.curselection()
+    if not idx:
+        return
+    centrum = centra[idx[0]]
+    map_widget.set_position(centrum.latitude, centrum.longitude)
+    map_widget.set_zoom(13)
+
+def pokaz_wszystkie_centra_na_mapie():
+    for c in centra:
+        if c.marker:
+            c.marker.delete()
+        c.marker = map_widget.set_marker(c.latitude, c.longitude, text=c.nazwa)
+    if centra:
+        lat = sum(c.latitude for c in centra) / len(centra)
+        lon = sum(c.longitude for c in centra) / len(centra)
+        map_widget.set_position(lat, lon)
+        map_widget.set_zoom(6)
+
+def pokaz_osoby_centrum(typ_osoby):
+    idx = listbox_centra.curselection()
+    if not idx:
+        return
+    centrum = centra[idx[0]]
+    nazwa = centrum.nazwa
+    dane = centrum_pracownicy if typ_osoby == "pracownik" else centrum_klienci
+    osoby = dane.get(nazwa, [])
+    for o in osoby:
+        if o.marker:
+            o.marker.delete()
+        o.marker = map_widget.set_marker(o.latitude, o.longitude, text=f"{o.imie_nazwisko}\n({o.miasto})")
+    if osoby:
+        lat = sum(o.latitude for o in osoby) / len(osoby)
+        lon = sum(o.longitude for o in osoby) / len(osoby)
+        map_widget.set_position(lat, lon)
+        map_widget.set_zoom(7)
